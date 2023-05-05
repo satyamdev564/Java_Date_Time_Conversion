@@ -1,0 +1,106 @@
+
+
+
+ 
+ 
+    private String dateFrom;
+
+    private String dateTo;
+
+    private LocalDateTime newDateFrom;
+
+    private LocalDateTime newDateTo;
+
+    public void checkTypeFrom(){
+        if( Objects.nonNull( dateFrom ) && validateDate(dateFrom)){
+            valueOfDateFrom(dateFrom );
+        }
+        else if (Objects.nonNull( dateFrom ) && !StringUtils.isBlank( dateFrom ) ){
+            valueOfDateFromTime( dateFrom );
+        }
+    }
+
+    public void valueOfDateFrom( String dateFrom ) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if( Objects.nonNull( dateFrom ) && validateDate(dateFrom)) {
+            try {
+                LocalDate date = LocalDate.parse( dateFrom, formatter );
+                this.dateFrom =  String.valueOf(date + "T00:00:00.000Z");
+                this.newDateFrom = LocalDateTime.parse(date+ "T00:00:00.000");
+            } catch ( DateTimeParseException dtpe ) {
+                throw new BusinessException(ERROR_REQUEST);
+            }
+        }
+    }
+
+    public void valueOfDateFromTime( String dateFrom ) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        if( Objects.nonNull( dateFrom ) ) {
+            try {
+                LocalDateTime dateTime = LocalDateTime.parse( dateFrom, formatter );
+                this.dateFrom =  String.valueOf(dateTime);
+                this.newDateFrom = dateTime;
+            } catch ( DateTimeParseException dtpe ) {
+                throw new BusinessException(ERROR_REQUEST);
+            }
+        }else {
+            throw new BusinessException(ERROR_REQUEST);
+        }
+    }
+
+    public void checkTypeTo(){
+        if( Objects.nonNull( dateTo ) && validateDate(dateTo)){
+            valueOfDateTo(dateTo );
+        }
+        else if (Objects.nonNull( dateTo ) && !StringUtils.isBlank( dateFrom )){
+            valueOfDateToTime( dateTo );
+        }
+    }
+
+    public void valueOfDateTo( String dateTo ) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        if( Objects.nonNull( dateTo ) && validateDate(dateTo) ) {
+            try {
+                LocalDate date = LocalDate.parse( dateTo, formatter );
+                this.dateTo =  String.valueOf(date + "T12:59:59.999Z");
+                this.newDateTo = LocalDateTime.parse(date+ "T12:59:59.999");
+            } catch ( DateTimeParseException dtpe ) {
+                throw new BusinessException(ERROR_REQUEST);
+            }
+        }
+    }
+
+    public void valueOfDateToTime( String dateTo ) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        if( Objects.nonNull( dateTo ) ) {
+            try {
+                LocalDateTime dateTime = LocalDateTime.parse( dateTo, formatter );
+                this.dateTo =  String.valueOf(dateTime);
+                this.newDateTo = dateTime;
+            } catch ( DateTimeParseException dtpe ) {
+                throw new BusinessException(ERROR_REQUEST);
+            }
+        }else {
+            throw new BusinessException(ERROR_REQUEST);
+        }
+    }
+
+    private boolean validateDate(String strDate){
+
+        boolean isValid = false;
+        String strDateRegEx =  "\\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|[3][01])";
+
+        if(strDate.matches(strDateRegEx)){
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            try{
+                sdf.parse(strDate);
+                isValid = true;
+                return isValid;
+            }catch( ParseException e){
+                throw new BusinessException(ERROR_REQUEST);
+            }
+        }
+        return isValid;
+    }
+
+}
